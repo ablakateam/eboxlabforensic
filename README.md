@@ -10,6 +10,25 @@ Designed for forensic examiners and legal professionals who need a fast, reliabl
 
 ---
 
+## Screenshots
+
+### Main Menu
+![Main Menu](screenshots/01_main_menu.png)
+
+### Case Management
+![Case List](screenshots/03_case_list.png)
+
+### Client Management
+![Client List](screenshots/02_client_list.png)
+
+### Norton Commander-Style File Manager
+![File Manager](screenshots/04_file_manager.png)
+
+### SHA-256 / MD5 Hash Calculator & File Attributes
+![Hash Calculator](screenshots/05_hash_detail.png)
+
+---
+
 ## Features
 
 ### Case & Evidence Management
