@@ -190,6 +190,8 @@ Automated builds run via GitHub Actions on every push to `main`. Tagged releases
 - **Email:** info@eboxlab.com
 - **Phone:** 888-714-6292
 
+**Planning & Project Oversight:** [Law Stars - Trial & Legal Services Colorado LLC](https://www.lawstars.com)
+
 ---
 
 ## License
