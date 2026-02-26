@@ -39,9 +39,6 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 Source: "eboxlab.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "README.md"; DestDir: "{app}"; Flags: ignoreversion
-Source: "FEATURES.md"; DestDir: "{app}"; Flags: ignoreversion
-Source: "PROJECT.md"; DestDir: "{app}"; Flags: ignoreversion
-Source: "PROGRESS.md"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Comment: "EBOXLAB Digital Forensics Platform"
