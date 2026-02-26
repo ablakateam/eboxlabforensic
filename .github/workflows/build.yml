@@ -1,0 +1,143 @@
+name: Build EBOXLAB
+
+on:
+  push:
+    branches: [ main, master ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  # ── Windows Build ─────────────────────────────────────────────────────────
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install MinGW-w64
+        run: |
+          choco install mingw -y
+          refreshenv
+
+      - name: Build PDCurses
+        shell: bash
+        run: |
+          cd PDCurses/wincon
+          mingw32-make -f Makefile WIDE=Y
+
+      - name: Build EBOXLAB
+        shell: bash
+        run: |
+          # Use system MinGW (installed by choco)
+          cat > Makefile.ci << 'EOF'
+          CXX      = g++
+          CXXFLAGS = -O2 -Wall -std=c++17 -DPDC_WIDE -I./PDCurses
+          LDFLAGS  = -static -L./PDCurses/wincon -l:pdcurses.a -lshell32 -lole32
+          SRCS = main.cpp ui.cpp datastore.cpp
+          OBJS = $(SRCS:.cpp=.o)
+          TARGET = eboxlab.exe
+          all: $(TARGET)
+          $(TARGET): $(OBJS)
+          	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
+          %.o: %.cpp
+          	$(CXX) $(CXXFLAGS) -c -o $@ $<
+          clean:
+          	rm -f *.o $(TARGET)
+          .PHONY: all clean
+          EOF
+          make -f Makefile.ci
+
+      - name: Install Inno Setup
+        run: choco install innosetup -y
+
+      - name: Build Installer
+        run: iscc installer.iss
+
+      - name: Upload Windows Installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: EBOXLAB-Windows-Installer
+          path: installer_output/EBOXLAB_Setup_v1.0.exe
+
+      - name: Upload Windows Portable
+        uses: actions/upload-artifact@v4
+        with:
+          name: EBOXLAB-Windows-Portable
+          path: eboxlab.exe
+
+  # ── macOS Build ───────────────────────────────────────────────────────────
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install ncurses
+        run: brew install ncurses
+
+      - name: Build EBOXLAB
+        run: |
+          NCURSES_PREFIX=$(brew --prefix ncurses)
+          make -f Makefile.macos \
+            CXXFLAGS="-O2 -Wall -std=c++17 -I${NCURSES_PREFIX}/include" \
+            LDFLAGS="-L${NCURSES_PREFIX}/lib -lncurses"
+
+      - name: Create DMG
+        run: |
+          chmod +x create_dmg.sh
+          # Rebuild inside the script uses Makefile.macos, override ncurses paths
+          export NCURSES_PREFIX=$(brew --prefix ncurses)
+          sed -i '' "s|CXXFLAGS = -O2 -Wall -std=c++17|CXXFLAGS = -O2 -Wall -std=c++17 -I${NCURSES_PREFIX}/include|" Makefile.macos
+          sed -i '' "s|LDFLAGS  = -lncurses|LDFLAGS  = -L${NCURSES_PREFIX}/lib -lncurses|" Makefile.macos
+          ./create_dmg.sh
+
+      - name: Upload macOS DMG
+        uses: actions/upload-artifact@v4
+        with:
+          name: EBOXLAB-macOS-DMG
+          path: EBOXLAB_v1.0.dmg
+
+      - name: Upload macOS Binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: EBOXLAB-macOS-Binary
+          path: eboxlab
+
+  # ── Release (only on tags) ───────────────────────────────────────────────
+  release:
+    needs: [build-windows, build-macos]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            EBOXLAB-Windows-Installer/EBOXLAB_Setup_v1.0.exe
+            EBOXLAB-Windows-Portable/eboxlab.exe
+            EBOXLAB-macOS-DMG/EBOXLAB_v1.0.dmg
+          body: |
+            ## EBOXLAB v${{ github.ref_name }}
+
+            Digital Forensics & eDiscovery Platform
+            by Law Stars - Trial Lawyers and Legal Services Colorado LLC
+
+            ### Downloads
+            - **Windows Installer** — `EBOXLAB_Setup_v1.0.exe` (recommended)
+            - **Windows Portable** — `eboxlab.exe` (single file, no install needed)
+            - **macOS** — `EBOXLAB_v1.0.dmg` (drag to Applications)
+
+            ### What's Included
+            - 7 entity management modules (Clients, Cases, Evidence, Chain of Custody, Examiners, Custodians, Activity Log)
+            - Norton Commander-style file manager
+            - SHA-256 / MD5 hash calculator
+            - Cross-entity search
+            - Demo data auto-seeded on first launch

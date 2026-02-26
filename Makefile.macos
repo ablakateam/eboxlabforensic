@@ -1,0 +1,31 @@
+# EBOXLAB macOS Build
+# Requires: Xcode Command Line Tools (xcode-select --install)
+#           ncurses (brew install ncurses) or use system ncurses
+
+CXX      = clang++
+CXXFLAGS = -O2 -Wall -std=c++17
+LDFLAGS  = -lncurses
+
+# If using Homebrew ncurses (recommended for full mouse support):
+# NCURSES_PREFIX = $(shell brew --prefix ncurses 2>/dev/null)
+# ifneq ($(NCURSES_PREFIX),)
+#     CXXFLAGS += -I$(NCURSES_PREFIX)/include
+#     LDFLAGS   = -L$(NCURSES_PREFIX)/lib -lncurses
+# endif
+
+SRCS = main.cpp ui.cpp datastore.cpp
+OBJS = $(SRCS:.cpp=.o)
+TARGET = eboxlab
+
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+clean:
+	rm -f *.o $(TARGET)
+
+.PHONY: all clean
