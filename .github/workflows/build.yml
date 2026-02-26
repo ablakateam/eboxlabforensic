@@ -14,17 +14,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          submodules: true
 
       - name: Install MinGW-w64
         run: |
           choco install mingw -y
           refreshenv
 
-      - name: Build PDCurses
+      - name: Clone & Build PDCurses
         shell: bash
         run: |
+          git clone https://github.com/wmcbrine/PDCurses.git
           cd PDCurses/wincon
           mingw32-make -f Makefile WIDE=Y
 
