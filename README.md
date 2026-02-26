@@ -165,6 +165,14 @@ Automated builds run via GitHub Actions on every push to `main`. Tagged releases
 
 ---
 
+## Contact
+
+- **Web:** [www.eboxlab.com](https://www.eboxlab.com)
+- **Email:** info@eboxlab.com
+- **Phone:** 888-714-6292
+
+---
+
 ## License
 
 Proprietary software developed for Law Stars - Trial Lawyers and Legal Services Colorado LLC. All rights reserved.
