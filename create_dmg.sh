@@ -55,7 +55,17 @@ export EBOXLAB_LAUNCHED=1
 osascript <<END
 tell application "Terminal"
     activate
-    do script "exec '${BINARY}'"
+    set newWindow to do script "'${BINARY}'; exit"
+    -- Wait for the process to finish, then close the window
+    repeat
+        delay 1
+        try
+            if not busy of newWindow then exit repeat
+        end try
+    end repeat
+    close window 1
+    -- If no windows left, quit Terminal
+    if (count of windows) is 0 then quit
 end tell
 END
 
