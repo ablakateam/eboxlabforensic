@@ -71,9 +71,23 @@ Designed for forensic examiners and legal professionals who need a fast, reliabl
 ### macOS
 
 1. Download `EBOXLAB_v1.0.dmg` from the [Releases](../../releases) page
-2. Open the DMG and drag `EBOXLAB.app` to Applications
-3. Launch from Applications — it opens in a Terminal window
-4. Data is stored in `~/Library/Application Support/EBOXLAB/`
+2. Double-click the DMG to mount it
+3. Drag `EBOXLAB.app` into the **Applications** folder
+4. **Important — First Launch Security Steps:**
+   - Double-click `EBOXLAB` in Applications
+   - macOS will show: *"EBOXLAB can't be opened because it is from an unidentified developer"*
+   - Click **OK** (do not move to Trash)
+   - Open **System Settings** > **Privacy & Security**
+   - Scroll down to the **Security** section — you'll see: *"EBOXLAB was blocked from use because it is not from an identified developer"*
+   - Click **Open Anyway**
+   - Enter your Mac password when prompted
+   - A confirmation dialog appears — click **Open**
+   - EBOXLAB will launch in a Terminal window
+5. After the first launch, macOS remembers your choice — future launches work normally with a double-click
+6. Demo data is automatically loaded on first launch
+7. Data is stored in `~/Library/Application Support/EBOXLAB/`
+
+> **Tip:** You can also right-click (or Control-click) the app and select **Open** from the context menu — this bypasses the security warning directly on the first attempt.
 
 ---
 
