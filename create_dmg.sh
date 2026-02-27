@@ -38,12 +38,29 @@ chmod +x "${APP_BUNDLE}/Contents/MacOS/eboxlab"
 cat > "${APP_BUNDLE}/Contents/MacOS/${APP_NAME}" << 'LAUNCHER'
 #!/bin/bash
 DIR="$(cd "$(dirname "$0")" && pwd)"
-osascript -e "
-tell application \"Terminal\"
+BINARY="${DIR}/eboxlab"
+
+# If already running inside a terminal, execute directly
+if [ -t 0 ] && [ -t 1 ]; then
+    exec "${BINARY}"
+fi
+
+# Launched from Finder — open Terminal with the binary
+# Use a marker env var to prevent re-launch loop
+if [ -n "${EBOXLAB_LAUNCHED}" ]; then
+    exec "${BINARY}"
+fi
+
+export EBOXLAB_LAUNCHED=1
+osascript <<END
+tell application "Terminal"
     activate
-    do script \"'${DIR}/eboxlab'; exit\"
+    do script "exec '${BINARY}'"
 end tell
-"
+END
+
+# Keep process alive briefly so macOS doesn't auto-retry
+sleep 2
 LAUNCHER
 chmod +x "${APP_BUNDLE}/Contents/MacOS/${APP_NAME}"
 
